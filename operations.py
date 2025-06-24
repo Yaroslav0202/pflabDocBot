@@ -6,11 +6,11 @@ from reportlab.pdfgen import canvas
 from reportlab.pdfbase.ttfonts import TTFont
 from reportlab.lib.pagesizes import letter
 from config import ROBOTO_FONT, DEFAULT_OUTPUT_FOLDER
+from docx2pdf import convert
 
 def create_pdfs_for_students(students_list, input_pdf_path, output_folder=DEFAULT_OUTPUT_FOLDER):
     os.makedirs(output_folder, exist_ok=True)
-    
-    # Регистрация шрифтов
+
     register_fonts()
 
     for student in students_list:

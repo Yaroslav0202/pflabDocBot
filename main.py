@@ -4,11 +4,9 @@ from handlers import Handlers
 from keyboards import get_main_keyboard
 import os
 
-# Инициализация бота
 bot = TeleBot("8025056970:AAEEPKspp6Wwa8DcipHlKihc-uiF93g7YZI")
 handlers = Handlers(bot)
 
-# Регистрация обработчиков
 @bot.message_handler(commands=['start'])
 def start(message):
     handlers.handle_start(message)

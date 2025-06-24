@@ -12,7 +12,7 @@ class Handlers:
     def handle_start(self, message):
         self.bot.reply_to(
             message,
-            "Это бот для создания PDF с подписями учеников",
+            "Это бот для создания PDF с подписями",
             reply_markup=get_main_keyboard()
         )
 
@@ -20,7 +20,7 @@ class Handlers:
         help_text = """
 Как использовать бота:
 1. Нажмите кнопку 'Создать PDF с подписями'
-2. Отправьте PDF файл для подписи (или используйте стандартный)
+2. Отправьте PDF файл
 3. Отправьте список учеников (каждый с новой строки)
 4. Получите готовые PDF файлы
 
@@ -60,7 +60,7 @@ class Handlers:
             return
         
         if not message.document or not message.document.file_name.endswith('.pdf'):
-            msg = self.bot.send_message(chat_id, "Отправьте PDF файл (default /skip)")
+            msg = self.bot.send_message(chat_id, "Отправьте PDF файл (/skip)")
             self.bot.register_next_step_handler(msg, self.process_pdf_step)
             return
         

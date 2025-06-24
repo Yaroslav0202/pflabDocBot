@@ -1,22 +1,14 @@
-import telebot
+from telebot import types
 
-def main_keyboard():
-    """Создает основную клавиатуру с инлайн кнопками."""
-    keyboard = telebot.types.InlineKeyboardMarkup()  # Используем InlineKeyboardMarkup
-    buttons = [
-        telebot.types.InlineKeyboardButton("Выбор олимпиады", callback_data='olymp'),
-        telebot.types.InlineKeyboardButton("Профиль", callback_data='profile'),
-        telebot.types.InlineKeyboardButton("О нас", callback_data='about'),
-    ]
-    keyboard.add(*buttons)
-    return keyboard
+def get_main_keyboard():
+    markup = types.ReplyKeyboardMarkup(resize_keyboard=True)
+    btn1 = types.KeyboardButton("Создать PDF с подписями")
+    btn2 = types.KeyboardButton("Помощь")
+    markup.add(btn1, btn2)
+    return markup
 
-
-def back_keyboard(callback='olymp'):
-    """Создает основную клавиатуру с инлайн кнопками."""
-    keyboard = telebot.types.InlineKeyboardMarkup()  # Используем InlineKeyboardMarkup
-    buttons = [
-        telebot.types.InlineKeyboardButton("Назад", callback_data=callback),
-    ]
-    keyboard.add(*buttons)
-    return keyboard
+def get_cancel_keyboard():
+    markup = types.ReplyKeyboardMarkup(resize_keyboard=True)
+    btn = types.KeyboardButton("Отмена")
+    markup.add(btn)
+    return markup

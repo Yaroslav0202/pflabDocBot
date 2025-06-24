@@ -4,11 +4,15 @@ from config import STATES, DEFAULT_INPUT_PDF
 from keyboards import get_main_keyboard, get_cancel_keyboard
 from operations import create_pdfs_for_students
 
+# Создаём класс Handlers
 class Handlers:
+
     def __init__(self, bot):
         self.bot = bot
         self.user_states = {}
 
+    # Функция команды /start
+    # Запускает бота, отправляет начальное сообщение
     def handle_start(self, message):
         self.bot.reply_to(
             message,
@@ -16,6 +20,8 @@ class Handlers:
             reply_markup=get_main_keyboard()
         )
 
+    # Функция команды /help
+    # Отпраляет инструкцию по пользованию ботом
     def handle_help(self, message):
         help_text = """
 Как использовать бота:
@@ -30,6 +36,8 @@ class Handlers:
 """
         self.bot.send_message(message.chat.id, help_text)
 
+    # функция кнопки "Создать PDF с подписями"
+    # отправляет сообщение, ожидает PDF-файл
     def handle_create_pdf(self, message):
         self.user_states[message.chat.id] = {"state": STATES["WAITING_FOR_PDF"]}
         msg = self.bot.send_message(
@@ -39,18 +47,23 @@ class Handlers:
         )
         self.bot.register_next_step_handler(msg, self.process_pdf_step)
 
+    # Функция
+    # Обрабатывает функцию отмены и отправку PDF файла по умолчанию
     def process_pdf_step(self, message):
         chat_id = message.chat.id
-        
+
+        #  Отменяет действие
         if message.text == "Отмена":
             self.bot.send_message(chat_id, "Действие отменено", reply_markup=get_main_keyboard())
             return
-        
+
+        # Отправляет PDF файл по умолчанию
         if message.text == "/skip":
             self.user_states[chat_id] = {
                 "state": STATES["WAITING_FOR_STUDENTS"],
                 "input_pdf": DEFAULT_INPUT_PDF
             }
+            # Отправляет сообщение,
             msg = self.bot.send_message(
                 chat_id,
                 "Отправьте список учеников (каждый с новой строки):",
@@ -58,7 +71,8 @@ class Handlers:
             )
             self.bot.register_next_step_handler(msg, self.process_students_step)
             return
-        
+
+        # Проверка на формат полученного документа
         if not message.document or not message.document.file_name.endswith('.pdf'):
             msg = self.bot.send_message(chat_id, "Отправьте PDF файл (/skip)")
             self.bot.register_next_step_handler(msg, self.process_pdf_step)

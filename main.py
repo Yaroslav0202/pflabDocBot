@@ -1,34 +1,38 @@
 from telebot import TeleBot
-from config import BASE_DIR
 from handlers import Handlers
-from keyboards import get_main_keyboard
 import os
 
-# Инициализвция бота
-bot = TeleBot("8025056970:AAEEPKspp6Wwa8DcipHlKihc-uiF93g7YZI")
+# Инициализация бота
+bot = TeleBot(os.getenv("TELEGRAM_BOT_TOKEN", "YOUR_BOT_TOKEN"))
 handlers = Handlers(bot)
 
-# Команда start
-@bot.message_handler(commands=['start'])
-def start(message):
-    handlers.handle_start(message)
+# Регистрация обработчиков
+@bot.message_handler(commands=['start', 'help'])
+def handle_commands(message):
+    if message.text == '/start':
+        handlers.handle_start(message)
+    else:
+        handlers.handle_help(message)
 
-# Команда help
-@bot.message_handler(commands=['help'])
-def help(message):
-    handlers.handle_help(message)
+@bot.message_handler(func=lambda m: m.text in ["Создать PDF с подписями", "Помощь"])
+def handle_buttons(message):
+    if message.text == "Создать PDF с подписями":
+        handlers.handle_create_pdf(message)
+    else:
+        handlers.handle_help(message)
 
-# Вывод кнопки помощи на клавиатуре снизу
-@bot.message_handler(func=lambda message: message.text == "Помощь")
-def help_button(message):
-    handlers.handle_help(message)
+@bot.message_handler(content_types=['document'])
+def handle_document(message):
+    chat_id = message.chat.id
+    if handlers.user_states.get(chat_id, {}).get("state") == 1:  # WAITING_FOR_FILE
+        handlers.process_file_step(message)
 
-# Вывод кнопки создания PDF на клавиатуре снизу
-@bot.message_handler(func=lambda message: message.text == "Создать PDF с подписями")
-def create_pdf(message):
-    handlers.handle_create_pdf(message)
+@bot.message_handler(content_types=['text'])
+def handle_text(message):
+    chat_id = message.chat.id
+    if handlers.user_states.get(chat_id, {}).get("state") == 2:  # WAITING_FOR_STUDENTS
+        handlers.process_students_step(message)
 
-# Функция запуска бота
 if __name__ == "__main__":
     print("Бот запущен...")
     bot.infinity_polling()

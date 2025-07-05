@@ -10,8 +10,8 @@ def get_main_keyboard():
     markup.add(*buttons)
     return markup
 
-def get_cancel_keyboard():
-    """Клавиатура с кнопкой 'Отмена'."""
-    markup = types.ReplyKeyboardMarkup(resize_keyboard=True)
-    markup.add(types.KeyboardButton("Отмена"))
-    return markup
+# def get_cancel_keyboard():
+#     """Клавиатура с кнопкой 'Отмена'."""
+#     markup = types.ReplyKeyboardMarkup(resize_keyboard=True)
+#     markup.add(types.KeyboardButton("Отмена"))
+#     return markup

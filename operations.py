@@ -4,7 +4,7 @@ from PyPDF2 import PdfWriter, PdfReader
 from reportlab.pdfbase import pdfmetrics
 from reportlab.pdfgen import canvas
 from reportlab.pdfbase.ttfonts import TTFont
-from docx import Document  # Для работы с Word
+from docx import Document
 from config import ROBOTO_FONT, DEFAULT_OUTPUT_FOLDER, SUPPORTED_FORMATS
 
 class FileProcessor:
@@ -78,34 +78,34 @@ class FileProcessor:
     @staticmethod
     def process_single_student(student, input_pdf_path, output_folder):
         # Добавляет подпись ученика в PDF
-        try:
-            with open(input_pdf_path, "rb") as pdf_file:
-                existing_pdf = PdfReader(pdf_file)
-                pdf_width = float(existing_pdf.pages[0].mediabox[2])
-                pdf_height = float(existing_pdf.pages[0].mediabox[3])
+        # try:
+        with open(input_pdf_path, "rb") as pdf_file:
+            existing_pdf = PdfReader(pdf_file)
+            pdf_width = float(existing_pdf.pages[0].mediabox[2])
+            pdf_height = float(existing_pdf.pages[0].mediabox[3])
 
-                # Создаем водяной знак с именем ученика
-                watermark_pdf = FileProcessor.create_watermark(student, pdf_width, pdf_height)
+            # Создаем подпись
+            watermark_pdf = FileProcessor.create_watermark(student, pdf_width, pdf_height)
 
-                # Накладываем подпись на страницы
-                output = PdfWriter()
-                for page in existing_pdf.pages:
-                    page.merge_page(watermark_pdf.pages[0])
-                    output.add_page(page)
+            # Пишем подпись на страницах
+            output = PdfWriter()
+            for page in existing_pdf.pages:
+                page.merge_page(watermark_pdf.pages[0])
+                output.add_page(page)
 
-                # Сохраняем PDF
-                output_filename = os.path.join(output_folder, f"Работа_{student}.pdf")
-                with open(output_filename, "wb") as output_stream:
-                    output.write(output_stream)
+            # Сохраняем PDF
+            output_filename = os.path.join(output_folder, f"Работа_{student}.pdf")
+            with open(output_filename, "wb") as output_stream:
+                output.write(output_stream)
 
-                return output_filename
+            return output_filename
 
-        except Exception as e:
-            return f"Ошибка для ученика {student}: {str(e)}"
+        # except Exception as e:
+        #     return f"Ошибка для ученика {student}: {str(e)}"
 
     @staticmethod
     def register_fonts():
-        """Регистрирует шрифты (Roboto или стандартные)."""
+        """Регистрирует шрифты"""
         try:
             if os.path.exists(ROBOTO_FONT):
                 pdfmetrics.registerFont(TTFont("Roboto", ROBOTO_FONT))
@@ -116,11 +116,11 @@ class FileProcessor:
 
     @staticmethod
     def create_watermark(text, width, height):
-        """Создает водяной знак с текстом."""
+        """Создает подпись"""
         packet = io.BytesIO()
         can = canvas.Canvas(packet, pagesize=(width, height))
         
-        # Пытаемся использовать доступные шрифты
+        # Пытаемся использовать шрифты
         for font in ["Roboto", "Helvetica-Bold", "Helvetica", "Times-Roman"]:
             try:
                 can.setFont(font, 15)
@@ -128,7 +128,7 @@ class FileProcessor:
             except:
                 continue
         
-        can.drawString(20, 20, text)  # Подпись внизу страницы
+        can.drawString(20, height - 30, text)  # Подпись внизу страницы
         can.save()
         
         packet.seek(0)

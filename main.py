@@ -3,10 +3,10 @@ from handlers import Handlers
 import os
 
 # Инициализация бота
-bot = TeleBot(os.getenv("TELEGRAM_BOT_TOKEN", "YOUR_BOT_TOKEN"))
+bot = TeleBot(os.getenv("8025056970:AAEEPKspp6Wwa8DcipHlKihc-uiF93g7YZI", "8025056970:AAEEPKspp6Wwa8DcipHlKihc-uiF93g7YZI"))
 handlers = Handlers(bot)
 
-# Регистрация обработчиков
+"""Регистрация обработчиков"""
 @bot.message_handler(commands=['start', 'help'])
 def handle_commands(message):
     if message.text == '/start':

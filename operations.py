@@ -1,75 +1,59 @@
 import os
 import io
+import tempfile
 from PyPDF2 import PdfWriter, PdfReader
 from reportlab.pdfbase import pdfmetrics
 from reportlab.pdfgen import canvas
 from reportlab.pdfbase.ttfonts import TTFont
 from docx import Document
-from config import ROBOTO_FONT, DEFAULT_OUTPUT_FOLDER, SUPPORTED_FORMATS
+from docx.shared import Inches
+from pdf2docx import Converter
+from config import ROBOTO_FONT, DEFAULT_OUTPUT_FOLDER
 
 class FileProcessor:
     @staticmethod
     def convert_to_pdf(input_path, output_folder):
-        # Конвертирует DOC/DOCX в PDF (если требуется)
+        """Конвертирует DOCX в PDF с сохранением изображений и форматирования"""
         if input_path.endswith('.pdf'):
-            return input_path  # Если PDF, возвращаем исходный файл
+            return input_path
             
         try:
-            doc = Document(input_path)  # Читаем Word-документ
+            # Создаем временный PDF-файл
             pdf_path = os.path.join(output_folder, "converted.pdf")
             
-            # Создаем PDF из текста Word
-            packet = io.BytesIO()
-            can = canvas.Canvas(packet)
+            # Конвертируем через pdf2docx (сохраняет изображения и стили)
+            cv = Converter(input_path)
+            cv.convert(pdf_path, start=0, end=None)
+            cv.close()
             
-            FileProcessor.register_fonts()  # Регистрируем шрифты
-            
-            # Переносим текст из Word в PDF
-            y = 700  # Начальная позиция текста
-            for para in doc.paragraphs:
-                if y < 50:  # Если текст не помещается, создаем новую страницу
-                    can.showPage()
-                    y = 700
-                can.setFont("Roboto", 12)
-                can.drawString(50, y, para.text)
-                y -= 20
-            
-            can.save()
-            packet.seek(0)
-            
-            # Сохраняем PDF
-            with open(pdf_path, "wb") as f:
-                f.write(packet.getvalue())
-                
             return pdf_path
         except Exception as e:
-            raise Exception(f"Ошибка конвертации: {str(e)}")
+            raise Exception(f"Ошибка: {str(e)}")
 
     @staticmethod
     def create_pdfs_for_students(students_list, input_path, output_folder=DEFAULT_OUTPUT_FOLDER):
-        """Создает PDF с подписями учеников."""
+        """Основная функция для создания PDF с подписями"""
         try:
-            # Конвертируем в PDF, если это Word
+            # Конвертируем в PDF (если это DOCX)
             if not input_path.endswith('.pdf'):
                 input_path = FileProcessor.convert_to_pdf(input_path, output_folder)
             
             if not os.path.exists(input_path):
-                yield f"Файл {input_path} не найден"
+                yield f"Ошибка: Файл {input_path} не найден"
                 return
 
             os.makedirs(output_folder, exist_ok=True)
             FileProcessor.register_fonts()
 
-            # Добавляем подписи для каждого ученика
             for student in students_list:
                 result = FileProcessor.process_single_student(student, input_path, output_folder)
                 yield result
 
         except Exception as e:
-            yield {str(e)}
+            yield f"Ошибка: {str(e)}"
         finally:
-            # Удаляем временный PDF после конвертации
-            if input_path.endswith('converted.pdf'):
+            # Удаляем временный файл после конвертации
+            if "converted.pdf" in input_path:
                 try:
                     os.remove(input_path)
                 except:
@@ -77,7 +61,7 @@ class FileProcessor:
 
     @staticmethod
     def process_single_student(student, input_pdf_path, output_folder):
-        # Добавляет подпись ученика в PDF
+        """Добавляет подпись ученика в PDF"""
         # try:
         with open(input_pdf_path, "rb") as pdf_file:
             existing_pdf = PdfReader(pdf_file)
@@ -128,7 +112,7 @@ class FileProcessor:
             except:
                 continue
         
-        can.drawString(20, height - 30, text)  # Подпись внизу страницы
+        can.drawString(20, height - 30, text)  # Подпись слева сверху
         can.save()
         
         packet.seek(0)

@@ -7,10 +7,12 @@ DEFAULT_INPUT_PDF = os.path.join(BASE_DIR, "default.pdf")  # Стандартн�
 DEFAULT_OUTPUT_FOLDER = os.path.join(BASE_DIR, "output_pdfs")  # Папка для готовых PDF
 FONTS_FOLDER = os.path.join(BASE_DIR, "fonts")  # Папка со шрифтами
 ROBOTO_FONT = os.path.join(FONTS_FOLDER, "Roboto-Regular.ttf")  # Путь к шрифту Roboto
+TEMP_FOLDER = os.path.join(BASE_DIR, "temp")  # Папка для временных файлов
 
 """Автоматическое создание папок"""
 os.makedirs(DEFAULT_OUTPUT_FOLDER, exist_ok=True)
 os.makedirs(FONTS_FOLDER, exist_ok=True)
+os.makedirs(TEMP_FOLDER, exist_ok=True)
 
 """Поддерживаемые форматы файлов"""
 SUPPORTED_FORMATS = {

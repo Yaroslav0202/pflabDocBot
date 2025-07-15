@@ -12,23 +12,22 @@ from config import ROBOTO_FONT, DEFAULT_OUTPUT_FOLDER
 
 class FileProcessor:
     @staticmethod
+
     def convert_to_pdf(input_path, output_folder):
-        """Конвертирует DOCX в PDF с сохранением изображений и форматирования"""
         if input_path.endswith('.pdf'):
             return input_path
             
         try:
-            # Создаем временный PDF-файл
-            pdf_path = os.path.join(output_folder, "converted.pdf")
+            from converters import convert_to_pdf as convert
+            pdf_path = convert(input_path, output_folder)
             
-            # Конвертируем через pdf2docx (сохраняет изображения и стили)
-            cv = Converter(input_path)
-            cv.convert(pdf_path, start=0, end=None)
-            cv.close()
-            
+            # Дополнительная проверка PDF
+            with open(pdf_path, 'rb') as f:
+                PdfReader(f)  # Проверяем что файл является валидным PDF
+                
             return pdf_path
         except Exception as e:
-            raise Exception(f"Ошибка: {str(e)}")
+            raise Exception(f"Ошибка конвертации: {str(e)}")
 
     @staticmethod
     def create_pdfs_for_students(students_list, input_path, output_folder=DEFAULT_OUTPUT_FOLDER):

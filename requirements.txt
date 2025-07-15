@@ -1,7 +1,5 @@
 PyPDF2==3.0.1
 reportlab==4.0.4
 python-docx==0.8.11
-pdf2docx==0.5.7
-docx2pdf==0.1.7
 pyTelegramBotAPI==4.12.0
 python-dotenv==1.0.0

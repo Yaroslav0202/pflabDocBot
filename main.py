@@ -1,9 +1,10 @@
 from telebot import TeleBot
 from handlers import Handlers
 import os
+from secrets import TOKEN
 
 # Инициализация бота
-bot = TeleBot(os.getenv("8025056970:AAEEPKspp6Wwa8DcipHlKihc-uiF93g7YZI", "8025056970:AAEEPKspp6Wwa8DcipHlKihc-uiF93g7YZI"))
+bot = TeleBot(TOKEN)
 handlers = Handlers(bot)
 
 """Регистрация обработчиков"""

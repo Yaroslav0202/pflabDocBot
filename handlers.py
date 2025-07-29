@@ -129,7 +129,7 @@ class Handlers:
             #     self.bot.send_message(chat_id, "Были ошибки", reply_markup=get_main_keyboard())
                 
         except Exception as e:
-            self.bot.send_message(chat_id, f"Ошибка: {str(e)}")
+            self.bot.send_message(chat_id, f"{str(e)}")
         finally:
             self.cleanup_user_data(chat_id)
 

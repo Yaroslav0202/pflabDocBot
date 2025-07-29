@@ -1,33 +1,28 @@
 import os
 import io
-import tempfile
 from PyPDF2 import PdfWriter, PdfReader
 from reportlab.pdfbase import pdfmetrics
 from reportlab.pdfgen import canvas
 from reportlab.pdfbase.ttfonts import TTFont
-from docx import Document
-from docx.shared import Inches
-from pdf2docx import Converter
 from config import ROBOTO_FONT, DEFAULT_OUTPUT_FOLDER
 
 class FileProcessor:
     @staticmethod
-
     def convert_to_pdf(input_path, output_folder):
         if input_path.endswith('.pdf'):
             return input_path
-            
+
         try:
             from converters import convert_to_pdf as convert
-            pdf_path = convert(input_path, output_folder)
-            
+            pdf_path = convert(input_path)
+
             # Дополнительная проверка PDF
             with open(pdf_path, 'rb') as f:
                 PdfReader(f)  # Проверяем что файл является валидным PDF
-                
+
             return pdf_path
         except Exception as e:
-            raise Exception(f"Ошибка конвертации: {str(e)}")
+            raise Exception(f"{str(e)}")
 
     @staticmethod
     def create_pdfs_for_students(students_list, input_path, output_folder=DEFAULT_OUTPUT_FOLDER):
@@ -38,7 +33,7 @@ class FileProcessor:
                 input_path = FileProcessor.convert_to_pdf(input_path, output_folder)
             
             if not os.path.exists(input_path):
-                yield f"Ошибка: Файл {input_path} не найден"
+                yield f"Файл {input_path} не найден"
                 return
 
             os.makedirs(output_folder, exist_ok=True)
@@ -49,7 +44,7 @@ class FileProcessor:
                 yield result
 
         except Exception as e:
-            yield f"Ошибка: {str(e)}"
+            yield f"{str(e)}"
         finally:
             # Удаляем временный файл после конвертации
             if "converted.pdf" in input_path:
@@ -84,7 +79,7 @@ class FileProcessor:
             return output_filename
 
         # except Exception as e:
-        #     return f"Ошибка для ученика {student}: {str(e)}"
+        #     return f"{str(e)}"
 
     @staticmethod
     def register_fonts():
@@ -95,7 +90,7 @@ class FileProcessor:
             else:
                 pdfmetrics.registerFont(TTFont("Helvetica", "Helvetica-Bold"))
         except Exception as e:
-            print(f"Ошибка регистрации шрифтов: {e}")
+            print(f"{e}")
 
     @staticmethod
     def create_watermark(text, width, height):

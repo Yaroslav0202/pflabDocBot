@@ -15,11 +15,7 @@ os.makedirs(FONTS_FOLDER, exist_ok=True)
 os.makedirs(TEMP_FOLDER, exist_ok=True)
 
 """Поддерживаемые форматы файлов"""
-SUPPORTED_FORMATS = {
-    'pdf': 'application/pdf',
-    'doc': 'application/msword',
-    'docx': 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
-}
+SUPPORTED_FORMATS = ['pdf', 'doc', 'docx']
 
 """Состояния бота"""
 STATES = {

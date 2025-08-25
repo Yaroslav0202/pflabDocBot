@@ -2,7 +2,6 @@ from telebot import types
 import os
 from config import STATES, SUPPORTED_FORMATS
 from keyboards import get_main_keyboard
-# , get_cancel_keyboard
 from operations import FileProcessor
 
 class Handlers:
@@ -14,8 +13,8 @@ class Handlers:
         """Приветственное сообщение."""
         self.bot.reply_to(
             message,
-            "Бот для создания PDF с подписями\n"
-            "Выберите действие ниже",
+            "Это бот для создания водяных знаков.\n"
+            "Выберите действие ниже ",
             reply_markup=get_main_keyboard()
         )
 
@@ -23,10 +22,11 @@ class Handlers:
         """Показывает справку."""
         help_text = """
 <b>Как использовать бота:</b>
-1. Нажмите <b>"Создать PDF с подписями"</b>
-2. Отправьте файл (PDF, DOC или DOCX)
-3. Отправьте список учеников (каждый с новой строки)
-4. Получите готовые файлы
+1. Нажмите <b>"Подписать документ"</b>
+2. Отправьте файл <b>(PDF, DOC или DOCX)</b>
+3. Отправьте текст для создания водяного знака \n
+(если несколько, то каждый с новой строки)
+4. Получите готовый(е) файл(ы)
 
 <b>Поддерживаемые форматы:</b>
 - PDF
@@ -40,18 +40,13 @@ class Handlers:
         self.user_states[message.chat.id] = {"state": STATES["WAITING_FOR_FILE"]}
         self.bot.send_message(
             message.chat.id,
-            "Отправьте файл (PDF, DOC или DOCX):",
-            # reply_markup=get_cancel_keyboard()
+            "Отправьте файл (PDF, DOC или DOCX):"
         )
 
     def process_file_step(self, message):
         """Обрабатывает загруженный файл"""
         chat_id = message.chat.id
         
-        # if message.text == "Отмена":
-        #     self.cleanup_user_data(chat_id)
-        #     self.bot.send_message(chat_id, "Действие отменено", reply_markup=get_main_keyboard())
-        #     return
         
         if not (message.document and message.document.file_name):
             msg = self.bot.send_message(chat_id, "Отправьте файл в формате PDF, DOC или DOCX:")
@@ -79,8 +74,7 @@ class Handlers:
             
             self.bot.send_message(
                 chat_id,
-                f"Файл загружен! Отправьте список учеников:",
-                # reply_markup=get_cancel_keyboard()
+                f"Файл загружен! Отправьте текст водяного знака:",
             )
             
         except Exception as e:
@@ -88,13 +82,9 @@ class Handlers:
             self.cleanup_user_data(chat_id)
 
     def process_students_step(self, message):
-        """Обрабатывает список учеников и создает PDF"""
+        """Обрабатывает список и создает PDF"""
         chat_id = message.chat.id
         
-        if message.text == "Отмена":
-            self.cleanup_user_data(chat_id)
-            self.bot.send_message(chat_id, "Действие отменено", reply_markup=get_main_keyboard())
-            return
         
         students = [s.strip() for s in message.text.split('\n') if s.strip()]
         
@@ -105,12 +95,8 @@ class Handlers:
         
         input_file = self.user_states.get(chat_id, {}).get("input_file")
         
-        # if not input_file or not os.path.exists(input_file):
-        #     self.bot.send_message(chat_id, "Ошибка: Файл не найден. Начните заново.")
-        #     self.cleanup_user_data(chat_id)
-        #     return
-        
-        self.bot.send_message(chat_id, "Подождите...")
+
+        self.bot.send_message(chat_id, "⏳ Подождите...")
         
         try:
             has_errors = False
@@ -123,10 +109,10 @@ class Handlers:
                     self.bot.send_message(chat_id, result)
                     has_errors = True
             
-            # if not has_errors:
-            self.bot.send_message(chat_id, "Готово!", reply_markup=get_main_keyboard())
-            # else:
-            #     self.bot.send_message(chat_id, "Были ошибки", reply_markup=get_main_keyboard())
+            if not has_errors:
+                self.bot.send_message(chat_id, "✅ Готово", reply_markup=get_main_keyboard())
+            else:
+                self.bot.send_message(chat_id, "❌ Что-то пошло не так", reply_markup=get_main_keyboard())
                 
         except Exception as e:
             self.bot.send_message(chat_id, f"{str(e)}")

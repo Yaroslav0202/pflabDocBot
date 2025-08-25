@@ -15,9 +15,9 @@ def handle_commands(message):
     else:
         handlers.handle_help(message)
 
-@bot.message_handler(func=lambda m: m.text in ["Создать PDF с подписями", "Помощь"])
+@bot.message_handler(func=lambda m: m.text in ["Подписать документ", "Помощь"])
 def handle_buttons(message):
-    if message.text == "Создать PDF с подписями":
+    if message.text == "Подписать документ":
         handlers.handle_create_pdf(message)
     else:
         handlers.handle_help(message)

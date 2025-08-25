@@ -72,14 +72,13 @@ class FileProcessor:
                 output.add_page(page)
 
             # Сохраняем PDF
-            output_filename = os.path.join(output_folder, f"Работа_{student}.pdf")
+            output_filename = os.path.join(output_folder, f"{student}.pdf")
             with open(output_filename, "wb") as output_stream:
                 output.write(output_stream)
 
             return output_filename
 
-        # except Exception as e:
-        #     return f"{str(e)}"
+
 
     @staticmethod
     def register_fonts():
